@@ -1,4 +1,7 @@
 #3
+import idautils
+import idaapi
+import idc
 
 export_functions = []
 
