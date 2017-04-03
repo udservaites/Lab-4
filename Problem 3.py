@@ -5,17 +5,17 @@ import idc
 
 export_functions = []
 
-#recusively search to an arbitrary depth for the imported functions
+#search recursively to get all the function calls
 def search(head, export):
     if GetFunctionName(head) in export_functions:
         print GetFunctionName(head), " : ", export
     else:
-        for ref in XrefsTo(head, 0):
-            if GetFunctionName(ref.frm) is not Name(head):
-                search(ref.frm, export)
+        for reference in XrefsTo(head, 0):
+            if GetFunctionName(reference.frm) is not Name(head):
+                search(reference.frm, export)
                 return
 
-#For each of the export functions, look for the imported functions
+#Look for an import funciton for each export function
 for i in range(GetEntryPointQty()):
     ord = GetEntryOrdinal(i)
     if ord == 0:
@@ -25,13 +25,13 @@ for i in range(GetEntryPointQty()):
 
 
 ea = ScreenEA()
-called_func = ["strcpy", "sprintf", "strncpy", "wcsncpy", "swprintf"]
-for f in Functions(SegStart(ea),SegEnd(ea)):
-    start = GetFunctionAttr(f, FUNCATTR_START)
-    end = GetFunctionAttr(f, FUNCATTR_END)
+#functions to search
+called_function = ["strcpy", "sprintf", "strncpy", "wcsncpy", "swprintf"]
+for function in Functions(SegStart(ea),SegEnd(ea)):
+    start = GetFunctionAttr(function, FUNCATTR_START)
+    end = GetFunctionAttr(function, FUNCATTR_END)
     for head in Heads(start, end):
         if isCode(GetFlags(head)):
             for word in GetDisasm(head).split():
-                #to match perfectly
-                if word in called_func:
+                if word in called_function:
                     search(head, word)
